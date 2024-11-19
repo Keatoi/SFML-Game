@@ -1,4 +1,5 @@
 #pragma once
+#include<iostream>
 #include<SFML/Audio.hpp>
 #include<SFML/System.hpp>
 #include<SFML/Window.hpp>
@@ -13,13 +14,20 @@ private:
 	sf::RenderWindow* Window;
 	sf::Event EV;
 	sf::VideoMode VidMode;
+
+	//GO
+	sf::RectangleShape TestEnemy;
+	//misc
+	sf::Vector2i mousePos;
 	//Private Functions
 	void InitVariables();
 	void InitWindow();
+	void InitEnemies();
 public:
 	//Constructors & Destructors
 	Game();
 	~Game();
+	
 	//getters
 	const bool Running();
 	//Functions

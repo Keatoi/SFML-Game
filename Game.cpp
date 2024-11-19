@@ -10,12 +10,23 @@ void Game::InitWindow()
 	this->VidMode.height = 480;
 	this->VidMode.width = 640;
 	this->Window = new sf::RenderWindow(this->VidMode, "Test", sf::Style::Titlebar | sf::Style::Close);
+	this->Window->setFramerateLimit(30);
+}
+
+void Game::InitEnemies()
+{
+	this->TestEnemy.setPosition(10.f,10.f);
+	this->TestEnemy.setSize(sf::Vector2f(50.f, 50.f));
+	this->TestEnemy.setFillColor(sf::Color::Magenta);
+	this->TestEnemy.setOutlineColor(sf::Color::Black);
+	this->TestEnemy.setOutlineThickness(1.f);
 }
 
 Game::Game()
 {
 	this->InitVariables();
 	this->InitWindow();
+	this->InitEnemies();
 }
 
 Game::~Game()
@@ -48,6 +59,9 @@ void Game::EventUpdate()
 void Game::update()
 {
 	this->EventUpdate();
+	//update mouse Pos relative to window
+	std::cout << "Mouse Pos ( " << sf::Mouse::getPosition(*this->Window).x << " , " << sf::Mouse::getPosition(*this->Window).y << " ) \n";
+	mousePos = sf::Mouse::getPosition(*this->Window);
 }
 
 void Game::render()
@@ -56,5 +70,6 @@ void Game::render()
 	/*++++++++++++++++
 	+++DRAW OBJ++++++++
 	+++++++++++++++++++*/
+	this->Window->draw(TestEnemy);
 	this->Window->display();//Send frame to display
 }
