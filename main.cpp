@@ -5,17 +5,7 @@ int main()
 	//Init GameEngine
 	Game Engine;
 	//GameLoop
-	while (Engine.Running())
-	{
-		
-		//UPDATE LOOP
-		Engine.update();
-		//RENDER LOOP
-		Engine.render();
-		//Draw game
-
-		
-	}
+	Engine.run();
 	//EOA
 	return 0;
 }

@@ -22,10 +22,17 @@ void Game::InitEnemies()
 	this->TestEnemy.setOutlineThickness(1.f);
 }
 
+void Game::InitPlayer()
+{
+	//Create a new player object
+	this->player = new Player();
+}
+
 Game::Game()
 {
 	this->InitVariables();
 	this->InitWindow();
+	this->InitPlayer();
 	this->InitEnemies();
 }
 
@@ -33,6 +40,7 @@ Game::~Game()
 {
 	//prevent mem leak
 	delete this->Window;
+	delete this->player;
 }
 const bool Game::Running()
 {
@@ -60,16 +68,32 @@ void Game::update()
 {
 	this->EventUpdate();
 	//update mouse Pos relative to window
-	std::cout << "Mouse Pos ( " << sf::Mouse::getPosition(*this->Window).x << " , " << sf::Mouse::getPosition(*this->Window).y << " ) \n";
+	//std::cout << "Mouse Pos ( " << sf::Mouse::getPosition(*this->Window).x << " , " << sf::Mouse::getPosition(*this->Window).y << " ) \n";
 	mousePos = sf::Mouse::getPosition(*this->Window);
+	//Move player
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) this->player->Move(-1.f, 0.f);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) this->player->Move(1.f, 0.f);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) this->player->Move(0.f, -1.f);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) this->player->Move(0.f, 1.f);
+	
 }
 
 void Game::render()
 {
-	this->Window->clear(sf::Color::Red);//Clear last frame
+	this->Window->clear(sf::Color::Black);//Clear last frame
 	/*++++++++++++++++
 	+++DRAW OBJ++++++++
 	+++++++++++++++++++*/
-	this->Window->draw(TestEnemy);
+	//this->Window->draw(TestEnemy);
+	this->player->Render(*this->Window);
 	this->Window->display();//Send frame to display
+}
+
+void Game::run()
+{
+	while (Running())
+	{
+		update();
+		render();
+	}
 }
