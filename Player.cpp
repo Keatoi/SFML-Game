@@ -3,7 +3,7 @@
 
 Player::Player()
 {
-	this->MoveSpeed = 10.f;
+	this->initVar();
 	this->initTexture();
 	this->initSprite();
 }
@@ -22,6 +22,13 @@ void Player::initTexture()
 	}
 }
 
+void Player::initVar()
+{
+	this->MoveSpeed = 10.f;
+	this->CNNCooldownMax = 10.f;
+	this->CNNCooldown = this->CNNCooldownMax;
+}
+
 void Player::initSprite()
 {
 
@@ -37,12 +44,38 @@ void Player::Move(const float dirX, const float dirY)
 	this->sprite.move(this->MoveSpeed * dirX, this->MoveSpeed * dirY);
 }
 
+const bool Player::bCanAttack()
+{
+	if (this->CNNCooldown >= this->CNNCooldownMax)
+	{
+		this->CNNCooldown = 0.f;
+		return true;
+	}
+	return false;
+}
+
 void Player::Update()
 {
+	this->UpdateAttacks();
+}
+
+void Player::UpdateAttacks()
+{
+	if (this->CNNCooldown < this->CNNCooldownMax)
+	{
+		this->CNNCooldown += 0.75f;
+	}
+	
 }
 
 void Player::Render(sf::RenderTarget& Target)
 {
 	Target.draw(this->sprite);
+	
+}
+
+const sf::Vector2f& Player::getPos() const
+{
+	return this->sprite.getPosition();
 	
 }

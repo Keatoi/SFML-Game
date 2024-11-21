@@ -13,6 +13,13 @@ void Game::InitWindow()
 	this->Window->setFramerateLimit(30);
 }
 
+void Game::InitTextures()
+{
+	//initialise textures into the map here
+	this->Textures["BULLET"] = new sf::Texture();
+	this->Textures["BULLET"]->loadFromFile("Textures/Bullet.png");
+}
+
 void Game::InitEnemies()
 {
 	this->TestEnemy.setPosition(10.f,10.f);
@@ -32,6 +39,7 @@ Game::Game()
 {
 	this->InitVariables();
 	this->InitWindow();
+	this->InitTextures();
 	this->InitPlayer();
 	this->InitEnemies();
 }
@@ -41,6 +49,15 @@ Game::~Game()
 	//prevent mem leak
 	delete this->Window;
 	delete this->player;
+	//go through and delete every texture in the map
+	for (auto& i : this->Textures)
+	{
+		delete i.second;
+	}
+	for (auto *i : this->Projectiles)
+	{
+		delete i;
+	}
 }
 const bool Game::Running()
 {
@@ -70,12 +87,42 @@ void Game::update()
 	//update mouse Pos relative to window
 	//std::cout << "Mouse Pos ( " << sf::Mouse::getPosition(*this->Window).x << " , " << sf::Mouse::getPosition(*this->Window).y << " ) \n";
 	mousePos = sf::Mouse::getPosition(*this->Window);
+	this->updateInput();
+	this->updatePhysics();
+	this->player->Update();
+}
+
+void Game::updateInput()
+{
 	//Move player
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) this->player->Move(-1.f, 0.f);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) this->player->Move(1.f, 0.f);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) this->player->Move(0.f, -1.f);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) this->player->Move(0.f, 1.f);
-	
+
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->player->bCanAttack())
+	{
+		//create new projectile GameObject, requires a texture,texture scale, Origin X & Y, Direction X & Y and Movement Speed
+		this->Projectiles.push_back(new Bullet(this->Textures["BULLET"],0.5f,0.5f,player->getPos().x, player->getPos().y, 0.f, -1.f, 5.f));
+	}
+}
+
+void Game::updatePhysics()
+{
+	unsigned counter = 0;
+	for (auto* projectile : this->Projectiles)
+	{
+		projectile->update();
+		//Out of bounds culling (top of screen)
+
+		if (projectile->getBounds().top + projectile->getBounds().height < 0.f)
+		{
+			delete this->Projectiles.at(counter);
+			this->Projectiles.erase(this->Projectiles.begin() + counter);
+			counter--;
+		}
+		counter++;
+	}
 }
 
 void Game::render()
@@ -86,6 +133,10 @@ void Game::render()
 	+++++++++++++++++++*/
 	//this->Window->draw(TestEnemy);
 	this->player->Render(*this->Window);
+	for (auto* i : this->Projectiles)
+	{
+		i->render(this->Window);
+	}
 	this->Window->display();//Send frame to display
 }
 

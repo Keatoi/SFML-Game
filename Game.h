@@ -1,5 +1,8 @@
 #pragma once
+
+#include<map>
 #include"Player.h"
+#include "Bullet.h"
 
 /* Game Engine wrapper class*/
 class Game
@@ -10,7 +13,9 @@ private:
 	sf::RenderWindow* Window;
 	sf::Event EV;
 	sf::VideoMode VidMode;
-
+	//Resource maps
+	std::map<std::string, sf::Texture*> Textures;
+	std::vector<Bullet*> Projectiles;
 	//GO
 	sf::RectangleShape TestEnemy;
 	//Player
@@ -21,6 +26,7 @@ private:
 	//Private Functions
 	void InitVariables();
 	void InitWindow();
+	void InitTextures();
 	void InitEnemies();
 	void InitPlayer();
 public:
@@ -33,6 +39,8 @@ public:
 	//Functions
 	void EventUpdate(); //poll events
 	void update();
+	void updateInput();
+	void updatePhysics();
 	void render();
 	void run();
 };

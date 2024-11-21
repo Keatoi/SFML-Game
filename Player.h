@@ -17,13 +17,20 @@ public:
 	sf::Texture texture;
 
 	float MoveSpeed;
+	float CNNCooldown;
+	float CNNCooldownMax;
 
 	void initTexture();
+	void initVar();
 	void initSprite();
 	
 	//Game funcs
 	void Move(const float dirX, const float dirY);
+	const bool bCanAttack();
 	void Update();
+	void UpdateAttacks();
 	void Render(sf::RenderTarget& Target);
+	//Getters
+	const sf::Vector2f& getPos() const;
 };
 
