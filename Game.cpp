@@ -33,6 +33,7 @@ void Game::InitPlayer()
 {
 	//Create a new player object
 	this->player = new Player();
+	this->enemies.push_back(new Enemy(0, 10, 10));
 }
 
 Game::Game()
@@ -55,6 +56,10 @@ Game::~Game()
 		delete i.second;
 	}
 	for (auto *i : this->Projectiles)
+	{
+		delete i;
+	}
+	for (auto* i : this->enemies)
 	{
 		delete i;
 	}
@@ -104,6 +109,8 @@ void Game::updateInput()
 	{
 		//create new projectile GameObject, requires a texture,texture scale, Origin X & Y, Direction X & Y and Movement Speed
 		this->Projectiles.push_back(new Bullet(this->Textures["BULLET"],0.5f,0.5f,player->getPos().x, player->getPos().y, 0.f, -1.f, 5.f));
+		//this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + 15.f, player->getPos().y, 0.f, -1.f, 5.f));
+		
 	}
 }
 
@@ -123,6 +130,10 @@ void Game::updatePhysics()
 		}
 		counter++;
 	}
+	for (auto* enemy : this->enemies)
+	{
+		enemy->update();
+	}
 }
 
 void Game::render()
@@ -134,6 +145,10 @@ void Game::render()
 	//this->Window->draw(TestEnemy);
 	this->player->Render(*this->Window);
 	for (auto* i : this->Projectiles)
+	{
+		i->render(this->Window);
+	}
+	for (auto* i : this->enemies)
 	{
 		i->render(this->Window);
 	}

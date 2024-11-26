@@ -3,6 +3,7 @@
 #include<map>
 #include"Player.h"
 #include "Bullet.h"
+#include "Enemy.h"
 
 /* Game Engine wrapper class*/
 class Game
@@ -18,6 +19,7 @@ private:
 	std::vector<Bullet*> Projectiles;
 	//GO
 	sf::RectangleShape TestEnemy;
+	std::vector<Enemy*> enemies;
 	//Player
 	Player* player;
 
