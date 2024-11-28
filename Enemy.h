@@ -12,6 +12,7 @@ private:
 	int type;
 	int hp;
 	int maxHP;
+	float speed;
 	int damage;
 	int points;
 	void initTexture();

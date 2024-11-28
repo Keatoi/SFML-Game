@@ -30,6 +30,7 @@ void Enemy::initVar(int EnemyType)
 		this->hp = maxHP;
 		this->damage = 1;
 		this->points = 10;
+		this->speed = 2.f;
 		break;
 	case 1:
 		this->type = 1;
@@ -37,13 +38,15 @@ void Enemy::initVar(int EnemyType)
 		this->hp = maxHP;
 		this->damage = 1;
 		this->points = 100;
+		this->speed = 1.f;
 		break;
 	default:
-		this->type = 0;
+		this->type = 2;
 		this->maxHP = 1;
 		this->hp = maxHP;
 		this->damage = 1;
-		this->points = 10;
+		this->points = 50;
+		this->speed = 5.f;
 		break;
 	}
 }
@@ -84,6 +87,7 @@ const sf::FloatRect Enemy::getBounds() const
 
 void Enemy::update()
 {
+	this->sprite.move(0.f, this->speed);
 }
 
 void Enemy::render(sf::RenderTarget* target)

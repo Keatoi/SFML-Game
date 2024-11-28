@@ -107,7 +107,7 @@ void Game::updateInput()
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->player->bCanAttack())
 	{
 		//create new projectile GameObject, requires a texture,texture scale, Origin X & Y, Direction X & Y and Movement Speed
-		this->Projectiles.push_back(new Bullet(this->Textures["BULLET"],0.5f,0.5f,player->getPos().x, player->getPos().y, 0.f, -1.f, 5.f));
+		this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width /2 , player->getPos().y, 0.f, -1.f, 5.f));
 		//this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + 15.f, player->getPos().y, 0.f, -1.f, 5.f));
 		
 	}
@@ -137,14 +137,23 @@ void Game::updateEnemies()
 	spawnTimer += 0.5f;
 	if (this->spawnTimer >= this->spawnTimerMax)
 	{
-		this->enemies.push_back(new Enemy(0,0.3f,0.3f, rand() % 200, rand()%200));
+		this->enemies.push_back(new Enemy(0, 0.3f, 0.3f, rand() % this->Window->getSize().x - 30.f , -100.f));
 		this->spawnTimer = 0.f;//reset spawntimer back down to 0;
 	}
 
-	for (auto* enemy : this->enemies)
+	for (int i = 0; i < enemies.size();i++)
 	{
-		enemy->update();
+		//update current enemy
+		this->enemies[i]->update();
+		//check if below cull line by checking if the top of the enemy sprite is outside the window
+		if (this->enemies[i]->getBounds().top > this->Window->getSize().y)
+		{
+			//delete this->enemies.at(i);
+			this->enemies.erase(this->enemies.begin() + i);
+		}
+
 	}
+	
 	
 }
 
