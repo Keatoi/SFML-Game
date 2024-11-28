@@ -22,7 +22,7 @@ public:
 	int initial_X = 10;
 	int initial_Y = 10;
 
-	Enemy(int type, float posX, float posY);
+	Enemy(int type,float scaleX,float scaleY, float posX, float posY);
 	~Enemy();
 	//Getters
 	const sf::Vector2f& getPos() const;

@@ -17,6 +17,8 @@ private:
 	//Resource maps
 	std::map<std::string, sf::Texture*> Textures;
 	std::vector<Bullet*> Projectiles;
+	float spawnTimer;
+	float spawnTimerMax;
 	//GO
 	sf::RectangleShape TestEnemy;
 	std::vector<Enemy*> enemies;
@@ -43,6 +45,7 @@ public:
 	void update();
 	void updateInput();
 	void updatePhysics();
+	void updateEnemies();
 	void render();
 	void run();
 };

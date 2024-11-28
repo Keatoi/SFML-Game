@@ -57,13 +57,14 @@ void Enemy::initSprite()
 	this->sprite.scale(3.f, 3.f);
 }
 
-Enemy::Enemy(int Enemytype,float posX, float posY)
+Enemy::Enemy(int Enemytype, float scaleX, float scaleY, float posX, float posY)
 {
 	
 	initVar(Enemytype);
 	initTexture();
 	initSprite();
 	this->sprite.setPosition(posX, posY);
+	this->sprite.scale(scaleX, scaleY);
 }
 
 Enemy::~Enemy()

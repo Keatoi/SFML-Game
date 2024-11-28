@@ -2,6 +2,7 @@
 #include "Game.h"
 int main()
 {
+	srand((unsigned)time(0));
 	//Init GameEngine
 	Game Engine;
 	//GameLoop

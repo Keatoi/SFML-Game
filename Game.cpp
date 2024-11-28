@@ -22,18 +22,16 @@ void Game::InitTextures()
 
 void Game::InitEnemies()
 {
-	this->TestEnemy.setPosition(10.f,10.f);
-	this->TestEnemy.setSize(sf::Vector2f(50.f, 50.f));
-	this->TestEnemy.setFillColor(sf::Color::Magenta);
-	this->TestEnemy.setOutlineColor(sf::Color::Black);
-	this->TestEnemy.setOutlineThickness(1.f);
+	this->spawnTimerMax = 20.f;
+	this->spawnTimer = spawnTimerMax;
+	
 }
 
 void Game::InitPlayer()
 {
 	//Create a new player object
 	this->player = new Player();
-	this->enemies.push_back(new Enemy(0, 10, 10));
+	
 }
 
 Game::Game()
@@ -95,6 +93,7 @@ void Game::update()
 	this->updateInput();
 	this->updatePhysics();
 	this->player->Update();
+	this->updateEnemies();
 }
 
 void Game::updateInput()
@@ -130,10 +129,23 @@ void Game::updatePhysics()
 		}
 		counter++;
 	}
+	
+}
+
+void Game::updateEnemies()
+{
+	spawnTimer += 0.5f;
+	if (this->spawnTimer >= this->spawnTimerMax)
+	{
+		this->enemies.push_back(new Enemy(0,0.3f,0.3f, rand() % 200, rand()%200));
+		this->spawnTimer = 0.f;//reset spawntimer back down to 0;
+	}
+
 	for (auto* enemy : this->enemies)
 	{
 		enemy->update();
 	}
+	
 }
 
 void Game::render()
