@@ -34,6 +34,19 @@ void Game::InitPlayer()
 	
 }
 
+void Game::InitGUI()
+{
+	//Load Font
+	this->font.loadFromFile("Font/VCR_OSD_MONO_1.001.tff");
+	//Init Score Text;
+	this->scoreText.setFont(this->font);
+	this->scoreText.setCharacterSize(12);
+	this->scoreText.setFillColor(sf::Color::White);
+	this->scoreText.setString("Score Text");
+
+
+}
+
 Game::Game()
 {
 	this->InitVariables();
@@ -134,6 +147,8 @@ void Game::updatePhysics()
 
 void Game::updateEnemies()
 {
+	//Update enemy pos, spawning and handle combat
+
 	spawnTimer += 0.5f;
 	if (this->spawnTimer >= this->spawnTimerMax)
 	{
@@ -143,13 +158,29 @@ void Game::updateEnemies()
 
 	for (int i = 0; i < enemies.size();i++)
 	{
-		//update current enemy
+		bool enemyKill = false;
+		//update current enemys
 		this->enemies[i]->update();
+		for (size_t j = 0; j < this->Projectiles.size() && !enemyKill; j++ )
+		{
+			
+			if (this->Projectiles[j]->getBounds().intersects(this->enemies[i]->getBounds()))
+			{
+				// if the bullet and enemy sprite intersect cull the enemy
+				
+				this->Projectiles.erase(this->Projectiles.begin() + j);
+				this->enemies.erase(this->enemies.begin() + i);
+				
+				enemyKill = true;
+				
+			}
+		}
 		//check if below cull line by checking if the top of the enemy sprite is outside the window
-		if (this->enemies[i]->getBounds().top > this->Window->getSize().y)
+		if (this->enemies[i]->getBounds().top > this->Window->getSize().y && !enemyKill)
 		{
 			//delete this->enemies.at(i);
 			this->enemies.erase(this->enemies.begin() + i);
+			enemyKill = true;
 		}
 
 	}

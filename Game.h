@@ -24,7 +24,9 @@ private:
 	std::vector<Enemy*> enemies;
 	//Player
 	Player* player;
-
+	//GUI
+	sf::Font font;
+	sf::Text scoreText;
 	//misc
 	sf::Vector2i mousePos;
 	//Private Functions
@@ -33,6 +35,7 @@ private:
 	void InitTextures();
 	void InitEnemies();
 	void InitPlayer();
+	void InitGUI();
 public:
 	//Constructors & Destructors
 	Game();
