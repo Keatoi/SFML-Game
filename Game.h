@@ -29,6 +29,8 @@ private:
 	sf::Text scoreText;
 	//misc
 	sf::Vector2i mousePos;
+	float score;
+	sf::Time deltaTime;
 	//Private Functions
 	void InitVariables();
 	void InitWindow();

@@ -28,6 +28,7 @@ public:
 	//Getters
 	const sf::Vector2f& getPos() const;
 	const sf::FloatRect getBounds() const;
+	const float getPoints() const;
 
 	void update();
 	void render(sf::RenderTarget* target);

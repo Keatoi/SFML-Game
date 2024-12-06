@@ -85,6 +85,11 @@ const sf::FloatRect Enemy::getBounds() const
 	return this->sprite.getGlobalBounds();
 }
 
+const float Enemy::getPoints() const
+{
+	return this->points;
+}
+
 void Enemy::update()
 {
 	this->sprite.move(0.f, this->speed);

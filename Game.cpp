@@ -3,6 +3,7 @@
 void Game::InitVariables()
 {
 	this->Window = nullptr;
+	this->score = 0;
 }
 
 void Game::InitWindow()
@@ -175,10 +176,12 @@ void Game::updateEnemies()
 				
 				this->Projectiles.erase(this->Projectiles.begin() + j);
 				this->enemies.erase(this->enemies.begin() + i);
-				
+				this->score += this->enemies[i]->getPoints();
+				std::cout << "Score: " << score;
 				enemyKill = true;
 				
 			}
+			
 		}
 		//check if below cull line by checking if the top of the enemy sprite is outside the window
 		if (this->enemies[i]->getBounds().top > this->Window->getSize().y && !enemyKill)
@@ -186,6 +189,11 @@ void Game::updateEnemies()
 			//delete this->enemies.at(i);
 			this->enemies.erase(this->enemies.begin() + i);
 			enemyKill = true;
+		}
+		//check if touching the player
+		if (this->player->getBounds().intersects(this->enemies[i]->getBounds()))
+		{
+
 		}
 
 	}
@@ -214,9 +222,11 @@ void Game::render()
 
 void Game::run()
 {
+	sf::Clock deltaClock;
 	while (Running())
 	{
 		update();
 		render();
+		deltaTime = deltaClock.restart();
 	}
 }
