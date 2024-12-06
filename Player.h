@@ -27,7 +27,7 @@ public:
 	//Game funcs
 	void Move(const float dirX, const float dirY);
 	const bool bCanAttack();
-	void Update();
+	void Update(float deltaTime);
 	void UpdateAttacks();
 	void Render(sf::RenderTarget& Target);
 	//Getters

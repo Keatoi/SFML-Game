@@ -54,7 +54,7 @@ const bool Player::bCanAttack()
 	return false;
 }
 
-void Player::Update()
+void Player::Update(float deltaTime)
 {
 	this->UpdateAttacks();
 }

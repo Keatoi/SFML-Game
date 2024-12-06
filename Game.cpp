@@ -4,6 +4,7 @@ void Game::InitVariables()
 {
 	this->Window = nullptr;
 	this->score = 0;
+	this->maxEnemies = 6;
 }
 
 void Game::InitWindow()
@@ -23,7 +24,7 @@ void Game::InitTextures()
 
 void Game::InitEnemies()
 {
-	this->spawnTimerMax = 20.f;
+	this->spawnTimerMax = 15.f;
 	this->spawnTimer = spawnTimerMax;
 	
 }
@@ -107,7 +108,7 @@ void Game::update()
 	mousePos = sf::Mouse::getPosition(*this->Window);
 	this->updateInput();
 	this->updatePhysics();
-	this->player->Update();
+	this->player->Update(deltaTime.asSeconds());
 	this->updateEnemies();
 }
 
@@ -148,7 +149,17 @@ void Game::updatePhysics()
 		}
 		counter++;
 	}
-	
+	//check if player is out of bounds
+	//Bottom
+	if (this->player->getBounds().top > this->Window->getSize().y)
+	{
+		this->player->sprite.setPosition(this->player->getPos().x, 0);
+	}
+	//Right
+	if (this->player->getBounds().left > this->Window->getSize().x)
+	{
+		this->player->sprite.setPosition(0,this->player->getPos().y);
+	}
 }
 
 void Game::updateEnemies()
@@ -156,10 +167,12 @@ void Game::updateEnemies()
 	//Update enemy pos, spawning and handle combat
 
 	spawnTimer += 0.5f;
-	if (this->spawnTimer >= this->spawnTimerMax)
+	enemyCount = enemies.size();
+	if (this->spawnTimer >= this->spawnTimerMax && enemyCount < maxEnemies)
 	{
 		this->enemies.push_back(new Enemy(0, 0.3f, 0.3f, rand() % this->Window->getSize().x - 30.f , -100.f));
 		this->spawnTimer = 0.f;//reset spawntimer back down to 0;
+		std::cout << "Enemy num: " << enemyCount;
 	}
 
 	for (int i = 0; i < enemies.size();i++)

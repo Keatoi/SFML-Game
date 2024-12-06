@@ -31,6 +31,8 @@ private:
 	sf::Vector2i mousePos;
 	float score;
 	sf::Time deltaTime;
+	int enemyCount;
+	int maxEnemies;
 	//Private Functions
 	void InitVariables();
 	void InitWindow();
