@@ -51,6 +51,7 @@ Game::Game()
 {
 	this->InitVariables();
 	this->InitWindow();
+	this->InitGUI();
 	this->InitTextures();
 	this->InitPlayer();
 	this->InitEnemies();
@@ -123,6 +124,10 @@ void Game::updateInput()
 		this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width /2 , player->getPos().y, 0.f, -1.f, 5.f));
 		//this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + 15.f, player->getPos().y, 0.f, -1.f, 5.f));
 		
+	}
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && this->player->bCanAttack())
+	{
+		this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width / 2, player->getPos().y, 0.f, 1.f, 5.f));
 	}
 }
 
