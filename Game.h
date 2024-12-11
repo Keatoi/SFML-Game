@@ -29,7 +29,7 @@ private:
 	sf::Text scoreText;
 	//misc
 	sf::Vector2i mousePos;
-	float score;
+	int score;
 	sf::Time deltaTime;
 	int enemyCount;
 	int maxEnemies;
@@ -53,7 +53,10 @@ public:
 	void updateInput();
 	void updatePhysics();
 	void updateEnemies();
+	void updateBattle();
+	void updateGUI();
 	void render();
+	void renderGUI();
 	void run();
 };
 

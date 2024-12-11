@@ -85,7 +85,7 @@ const sf::FloatRect Enemy::getBounds() const
 	return this->sprite.getGlobalBounds();
 }
 
-const float Enemy::getPoints() const
+const int Enemy::getPoints() const
 {
 	return this->points;
 }

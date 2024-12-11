@@ -4,7 +4,7 @@ void Game::InitVariables()
 {
 	this->Window = nullptr;
 	this->score = 0;
-	this->maxEnemies = 6;
+	this->maxEnemies = 2;
 }
 
 void Game::InitWindow()
@@ -39,12 +39,12 @@ void Game::InitPlayer()
 void Game::InitGUI()
 {
 	//Load Font
-	this->font.loadFromFile("Font/VCR_OSD_MONO_1.001.tff");
+	this->font.loadFromFile("Fonts/gameFont.ttf");
 	//Init Score Text;
 	this->scoreText.setFont(this->font);
 	this->scoreText.setCharacterSize(12);
 	this->scoreText.setFillColor(sf::Color::White);
-	this->scoreText.setString("Score Text");
+	this->scoreText.setString("Score Test");
 
 
 }
@@ -109,7 +109,10 @@ void Game::update()
 	this->updateInput();
 	this->updatePhysics();
 	this->player->Update(deltaTime.asSeconds());
+	//this->player->LookAtMouse(*this->Window);
 	this->updateEnemies();
+	this->updateBattle();
+	this->updateGUI();
 }
 
 void Game::updateInput()
@@ -164,8 +167,7 @@ void Game::updatePhysics()
 
 void Game::updateEnemies()
 {
-	//Update enemy pos, spawning and handle combat
-
+	//Spawning
 	spawnTimer += 0.5f;
 	enemyCount = enemies.size();
 	if (this->spawnTimer >= this->spawnTimerMax && enemyCount < maxEnemies)
@@ -174,44 +176,56 @@ void Game::updateEnemies()
 		this->spawnTimer = 0.f;//reset spawntimer back down to 0;
 		std::cout << "Enemy num: " << enemyCount;
 	}
-
-	for (int i = 0; i < enemies.size();i++)
+	//update
+	unsigned counter = 0;
+	for (auto* enemy : this->enemies)
 	{
-		bool enemyKill = false;
-		//update current enemys
-		this->enemies[i]->update();
-		for (size_t j = 0; j < this->Projectiles.size() && !enemyKill; j++ )
-		{
-			
-			if (this->Projectiles[j]->getBounds().intersects(this->enemies[i]->getBounds()))
-			{
-				// if the bullet and enemy sprite intersect cull the enemy
-				
-				this->Projectiles.erase(this->Projectiles.begin() + j);
-				this->enemies.erase(this->enemies.begin() + i);
-				this->score += this->enemies[i]->getPoints();
-				std::cout << "Score: " << score;
-				enemyKill = true;
-				
-			}
-			
-		}
-		//check if below cull line by checking if the top of the enemy sprite is outside the window
-		if (this->enemies[i]->getBounds().top > this->Window->getSize().y && !enemyKill)
-		{
-			//delete this->enemies.at(i);
-			this->enemies.erase(this->enemies.begin() + i);
-			enemyKill = true;
-		}
-		//check if touching the player
-		if (this->player->getBounds().intersects(this->enemies[i]->getBounds()))
-		{
+		enemy->update();
+		//Out of bounds culling (top of screen)
 
+		if (enemy->getBounds().top > this->Window->getSize().y)
+		{
+			delete this->enemies.at(counter);
+			this->enemies.erase(this->enemies.begin() + counter);
+			counter--;
 		}
-
+		counter++;
 	}
 	
 	
+}
+
+void Game::updateBattle()
+{
+	for (size_t i = 0; i < enemies.size(); i++)
+	{
+		bool enemyKill = false;
+		for (size_t k = 0; k < this->Projectiles.size() && !enemyKill; k++)
+		{
+			if (this->enemies[i]->getBounds().intersects(this->Projectiles[k]->getBounds()))
+			{
+				//this->score += this->enemies[i]->getPoints();
+
+				delete enemies.at(i);
+				this->enemies.erase(this->enemies.begin() + i);
+				--i;
+				delete this->Projectiles[k];
+				this->Projectiles.erase(this->Projectiles.begin() + k);
+				enemyKill = true;
+			}
+		}
+		if (this->player->getBounds().intersects(this->enemies[i]->getBounds()))
+		{
+			//do damage or something
+		}
+
+	}
+
+}
+
+void Game::updateGUI()
+{
+
 }
 
 void Game::render()
@@ -230,7 +244,13 @@ void Game::render()
 	{
 		i->render(this->Window);
 	}
+	this->renderGUI();
 	this->Window->display();//Send frame to display
+}
+
+void Game::renderGUI()
+{
+	this->Window->draw(this->scoreText);
 }
 
 void Game::run()

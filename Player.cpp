@@ -59,6 +59,20 @@ void Player::Update(float deltaTime)
 	this->UpdateAttacks();
 }
 
+void Player::LookAtMouse(sf::RenderWindow &Win)
+{
+	sf::Vector2f currPos = this->sprite.getPosition();
+	sf::Vector2i mousePos = sf::Mouse::getPosition(Win);
+	const float PI = 3.14159265;
+
+	float dX = currPos.x - mousePos.x;
+	float dY = currPos.y - mousePos.y;
+
+	float rotation = (atan2(dX, dY)) * 180 / PI;
+	
+	this->sprite.setRotation(rotation + 180);
+}
+
 void Player::UpdateAttacks()
 {
 	if (this->CNNCooldown < this->CNNCooldownMax)

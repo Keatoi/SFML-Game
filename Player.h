@@ -28,6 +28,7 @@ public:
 	void Move(const float dirX, const float dirY);
 	const bool bCanAttack();
 	void Update(float deltaTime);
+	void LookAtMouse(sf::RenderWindow& Win);
 	void UpdateAttacks();
 	void Render(sf::RenderTarget& Target);
 	//Getters
