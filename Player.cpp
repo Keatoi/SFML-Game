@@ -25,7 +25,7 @@ void Player::initTexture()
 void Player::initVar()
 {
 	this->MoveSpeed = 10.f;
-	this->CNNCooldownMax = 10.f;
+	this->CNNCooldownMax = 5.f;
 	this->CNNCooldown = this->CNNCooldownMax;
 }
 
@@ -86,6 +86,11 @@ void Player::Render(sf::RenderTarget& Target)
 {
 	Target.draw(this->sprite);
 	
+}
+
+void Player::teleport(float XCoord, float YCoord)
+{
+	this->sprite.setPosition(XCoord, YCoord);
 }
 
 const sf::Vector2f& Player::getPos() const

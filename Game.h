@@ -16,12 +16,12 @@ private:
 	sf::VideoMode VidMode;
 	//Resource maps
 	std::map<std::string, sf::Texture*> Textures;
-	std::vector<Bullet*> Projectiles;
+	std::vector<std::unique_ptr<Bullet>> Projectiles;
 	float spawnTimer;
 	float spawnTimerMax;
 	//GO
 	sf::RectangleShape TestEnemy;
-	std::vector<Enemy*> enemies;
+	std::vector<std::unique_ptr<Enemy>> enemies;
 	//Player
 	Player* player;
 	//GUI
@@ -32,6 +32,7 @@ private:
 	int score;
 	sf::Time deltaTime;
 	int enemyCount;
+	int spawnCount;
 	int maxEnemies;
 	//Private Functions
 	void InitVariables();
@@ -52,6 +53,7 @@ public:
 	void update();
 	void updateInput();
 	void updatePhysics();
+	void spawnEnemyGroup(int count);
 	void updateEnemies();
 	void updateBattle();
 	void updateGUI();

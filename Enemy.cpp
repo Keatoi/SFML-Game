@@ -30,7 +30,7 @@ void Enemy::initVar(int EnemyType)
 		this->hp = maxHP;
 		this->damage = 1;
 		this->points = 10;
-		this->speed = 2.f;
+		this->speed = 50.f;
 		break;
 	case 1:
 		this->type = 1;
@@ -60,7 +60,7 @@ void Enemy::initSprite()
 	this->sprite.scale(3.f, 3.f);
 }
 
-Enemy::Enemy(int Enemytype, float scaleX, float scaleY, float posX, float posY)
+Enemy::Enemy(int Enemytype, float scaleX, float scaleY, float posX, float posY,float amplitude, float frequency, float phase)
 {
 	
 	initVar(Enemytype);
@@ -68,6 +68,12 @@ Enemy::Enemy(int Enemytype, float scaleX, float scaleY, float posX, float posY)
 	initSprite();
 	this->sprite.setPosition(posX, posY);
 	this->sprite.scale(scaleX, scaleY);
+	this->SpawnX = posX;
+	this->SpawnY = posY;
+	amp = amplitude;
+	freq = frequency;
+	phaseOffset = phase;
+
 }
 
 Enemy::~Enemy()
@@ -90,9 +96,12 @@ const int Enemy::getPoints() const
 	return this->points;
 }
 
-void Enemy::update()
+void Enemy::update(sf::Time DeltaTime)
 {
-	this->sprite.move(0.f, this->speed);
+	this->SpawnY += speed * DeltaTime.asSeconds();
+	float newX = SpawnX + std::sin(SpawnY * freq) * amp;
+	this->sprite.setPosition(newX, SpawnY);
+	//std::cout << "Position: " << newX << SpawnY;
 }
 
 void Enemy::render(sf::RenderTarget* target)

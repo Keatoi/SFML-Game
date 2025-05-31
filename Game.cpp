@@ -4,13 +4,14 @@ void Game::InitVariables()
 {
 	this->Window = nullptr;
 	this->score = 0;
-	this->maxEnemies = 2;
+	this->maxEnemies = 100;
+	this->spawnCount = 1;
 }
 
 void Game::InitWindow()
 {
-	this->VidMode.height = 480;
-	this->VidMode.width = 640;
+	this->VidMode.height = 720;
+	this->VidMode.width = 480;
 	this->Window = new sf::RenderWindow(this->VidMode, "Test", sf::Style::Titlebar | sf::Style::Close);
 	this->Window->setFramerateLimit(30);
 }
@@ -20,6 +21,8 @@ void Game::InitTextures()
 	//initialise textures into the map here
 	this->Textures["BULLET"] = new sf::Texture();
 	this->Textures["BULLET"]->loadFromFile("Textures/Bullet.png");
+	if (!this->Textures["BULLET"]->loadFromFile("Textures/Bullet.png"))
+		std::cout << "Failed to load bullet texture!\n";
 }
 
 void Game::InitEnemies()
@@ -31,8 +34,9 @@ void Game::InitEnemies()
 
 void Game::InitPlayer()
 {
-	//Create a new player object
+	//Create a new player object and teleport to middle of screen
 	this->player = new Player();
+	this->player->teleport(this->Window->getSize().x / static_cast<float>(2), this->Window->getSize().x / static_cast<float>(2));
 	
 }
 
@@ -69,14 +73,7 @@ Game::~Game()
 	{
 		delete i.second;
 	}
-	for (auto *i : this->Projectiles)
-	{
-		delete i;
-	}
-	for (auto* i : this->enemies)
-	{
-		delete i;
-	}
+	
 }
 const bool Game::Running()
 {
@@ -126,31 +123,37 @@ void Game::updateInput()
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->player->bCanAttack())
 	{
 		//create new projectile GameObject, requires a texture,texture scale, Origin X & Y, Direction X & Y and Movement Speed
-		this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width /2 , player->getPos().y, 0.f, -1.f, 5.f));
-		//this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + 15.f, player->getPos().y, 0.f, -1.f, 5.f));
 		
+		this->Projectiles.push_back(std::make_unique<Bullet>(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width /2 , player->getPos().y, 0.f, -1.f, 15.f));
+		//this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + 15.f, player->getPos().y, 0.f, -1.f, 5.f));
+		//std::cout << "Bullet created, projectiles count: " << this->Projectiles.size() << std::endl;
 	}
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && this->player->bCanAttack())
 	{
-		this->Projectiles.push_back(new Bullet(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width / 2, player->getPos().y, 0.f, 1.f, 5.f));
+		this->Projectiles.push_back(std::make_unique<Bullet>(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width / 2, player->getPos().y, 0.f, 1.f, 5.f));
 	}
 }
 
 void Game::updatePhysics()
 {
-	unsigned counter = 0;
-	for (auto* projectile : this->Projectiles)
+	
+	for (auto pr = Projectiles.begin(); pr != Projectiles.end();)
 	{
-		projectile->update();
+		//dereference the unique ptr and call the update method
+		(*pr)->update();
 		//Out of bounds culling (top of screen)
 
-		if (projectile->getBounds().top + projectile->getBounds().height < 0.f)
+		if ((*pr)->getBounds().top + (*pr)->getBounds().height < 0.f)
 		{
-			delete this->Projectiles.at(counter);
-			this->Projectiles.erase(this->Projectiles.begin() + counter);
-			counter--;
+			
+			pr = this->Projectiles.erase(pr);
+			
 		}
-		counter++;
+		else
+		{
+			pr++;
+		}
+		
 	}
 	//check if player is out of bounds
 	//Bottom
@@ -165,31 +168,57 @@ void Game::updatePhysics()
 	}
 }
 
+void Game::spawnEnemyGroup(int count)
+{
+	//Position the group somewhere in the window with a 30 pixel margin on each side
+	float posX = rand() % (this->Window->getSize().x - 60) + 30.f;
+	for (size_t i = 0; i < count; i++)
+	{
+		float phase = i * 0.5f;
+		//spawn each member of the group 40 pixels apart
+		float y = -1.f - (i * 40.f);
+		this->enemies.push_back(std::make_unique<Enemy>(0, 0.3f, 0.3f, posX, y,20.f,0.02f,i * 0.5));
+		enemyCount++;
+	}
+}
+
 void Game::updateEnemies()
 {
 	//Spawning
-	spawnTimer += 0.5f;
-	enemyCount = enemies.size();
-	if (this->spawnTimer >= this->spawnTimerMax && enemyCount < maxEnemies)
+	spawnTimer += 0.1f;
+	if (this->spawnTimer >= this->spawnTimerMax )
 	{
-		this->enemies.push_back(new Enemy(0, 0.3f, 0.3f, rand() % this->Window->getSize().x - 30.f , -100.f));
+		spawnEnemyGroup(spawnCount);
 		this->spawnTimer = 0.f;//reset spawntimer back down to 0;
-		std::cout << "Enemy num: " << enemyCount;
+		spawnCount *= 2;
+	}
+	if (enemyCount >= maxEnemies)
+	{
+		//start new wave
+		spawnCount, enemyCount,spawnTimer = 0.f;
+		//slightly increase diff
+		spawnTimerMax = std::max(0.5f, spawnTimerMax -= 0.5f);
+		//TODO New Wave Transition
+
 	}
 	//update
-	unsigned counter = 0;
-	for (auto* enemy : this->enemies)
+	
+	for (auto AI = enemies.begin(); AI != enemies.end();)
 	{
-		enemy->update();
+		(*AI)->update(deltaTime);
 		//Out of bounds culling (top of screen)
 
-		if (enemy->getBounds().top > this->Window->getSize().y)
+		if ((*AI)->getBounds().top > this->Window->getSize().y)
 		{
-			delete this->enemies.at(counter);
-			this->enemies.erase(this->enemies.begin() + counter);
-			counter--;
+			
+			AI = enemies.erase(AI);
+			
 		}
-		counter++;
+		else
+		{
+			AI++;
+		}
+		
 	}
 	
 	
@@ -197,27 +226,36 @@ void Game::updateEnemies()
 
 void Game::updateBattle()
 {
-	for (size_t i = 0; i < enemies.size(); i++)
+	for (auto ai = enemies.begin(); ai != enemies.end();)
 	{
 		bool enemyKill = false;
-		for (size_t k = 0; k < this->Projectiles.size() && !enemyKill; k++)
+		for (auto pr = Projectiles.begin(); pr != Projectiles.end() && !enemyKill;)
 		{
-			if (this->enemies[i]->getBounds().intersects(this->Projectiles[k]->getBounds()))
+			if ((*ai)->getBounds().intersects((*pr)->getBounds()))
 			{
 				//this->score += this->enemies[i]->getPoints();
-
-				delete enemies.at(i);
-				this->enemies.erase(this->enemies.begin() + i);
-				--i;
-				delete this->Projectiles[k];
-				this->Projectiles.erase(this->Projectiles.begin() + k);
+				//erase both the ai and projectile. Smart ptr so no manual deletion required.
+				
+				ai = enemies.erase(ai);
+				
+				pr = Projectiles.erase(pr);
 				enemyKill = true;
 			}
+			else
+			{
+				pr++;
+			}
+			
 		}
-		if (this->player->getBounds().intersects(this->enemies[i]->getBounds()))
+		if (!enemyKill)
 		{
-			//do damage or something
+			if (this->player->getBounds().intersects((*ai)->getBounds()))
+			{
+				//do damage or something
+			}
+			ai++;
 		}
+		
 
 	}
 
@@ -236,11 +274,12 @@ void Game::render()
 	+++++++++++++++++++*/
 	//this->Window->draw(TestEnemy);
 	this->player->Render(*this->Window);
-	for (auto* i : this->Projectiles)
+	for (const auto& i : this->Projectiles)
 	{
+		std::cout << "rendering bullet";
 		i->render(this->Window);
 	}
-	for (auto* i : this->enemies)
+	for (const auto& i : this->enemies)
 	{
 		i->render(this->Window);
 	}
