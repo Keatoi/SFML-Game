@@ -36,7 +36,7 @@ public:
 	void UpdateAttacks();
 	void Render(sf::RenderTarget& Target);
 	void teleport(float XCoord, float YCoord);
-	void OnHit(float damage);
+	float OnHit(float damage);
 	//Getters
 	const sf::Vector2f& getPos() const;
 	const sf::FloatRect getBounds() const;

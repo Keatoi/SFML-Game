@@ -59,11 +59,16 @@ const bool Player::bCanAttack()
 void Player::Update(float deltaTime)
 {
 	this->UpdateAttacks();
-	this->ImmortalTimer -= deltaTime;
-	if (this->ImmortalTimer <= 0)
+	if (bIsImmortal)
 	{
-		this->ImmortalTimer = this->MaxImmortal;
+		this->ImmortalTimer -= deltaTime;
+		if (this->ImmortalTimer <= 0)
+		{
+			
+			bIsImmortal = false;
+		}
 	}
+	
 }
 
 void Player::LookAtMouse(sf::RenderWindow &Win)
@@ -100,14 +105,21 @@ void Player::teleport(float XCoord, float YCoord)
 	this->sprite.setPosition(XCoord, YCoord);
 }
 
-void Player::OnHit(float damage)
+float Player::OnHit(float damage)
 {
-	bIsImmortal = true;
-	HP -= damage;
-	if (HP <= 0)
+	if (!bIsImmortal)
 	{
-		//ENDGAME
+		bIsImmortal = true;
+		HP -= damage;
+		this->ImmortalTimer = this->MaxImmortal;
+		if (HP <= 0)
+		{
+			//ENDGAME
+		}
 	}
+	
+	return HP;
+	
 }
 
 const sf::Vector2f& Player::getPos() const

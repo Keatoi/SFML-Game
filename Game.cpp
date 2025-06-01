@@ -49,6 +49,12 @@ void Game::InitGUI()
 	this->scoreText.setCharacterSize(12);
 	this->scoreText.setFillColor(sf::Color::White);
 	this->scoreText.setString("Score Test");
+	//Init HP text
+	this->HPText.setFont(this->font);
+	this->HPText.setCharacterSize(12);
+	this->HPText.setFillColor(sf::Color::Green);
+	this->HPText.setString("Test");
+
 
 
 }
@@ -252,7 +258,8 @@ void Game::updateBattle()
 			if (this->player->getBounds().intersects((*ai)->getBounds()))
 			{
 				//do damage or something
-				this->player->OnHit(10.f);
+				this->HPText.setString(std::to_string(this->player->OnHit(10.f)));
+				
 			}
 			ai++;
 		}
@@ -266,6 +273,8 @@ void Game::updateGUI()
 {
 	std::string scoreString = std::to_string(score);
 	this->scoreText.setString(scoreString);
+	this->HPText.setPosition(this->player->getPos().x, this->player->getPos().y + 1.f);
+	
 }
 
 void Game::render()
@@ -292,6 +301,7 @@ void Game::render()
 void Game::renderGUI()
 {
 	this->Window->draw(this->scoreText);
+	this->Window->draw(this->HPText);
 }
 
 void Game::run()
