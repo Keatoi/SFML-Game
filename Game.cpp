@@ -233,7 +233,7 @@ void Game::updateBattle()
 		{
 			if ((*ai)->getBounds().intersects((*pr)->getBounds()))
 			{
-				//this->score += this->enemies[i]->getPoints();
+				this->score += (*ai)->getPoints();
 				//erase both the ai and projectile. Smart ptr so no manual deletion required.
 				
 				ai = enemies.erase(ai);
@@ -263,7 +263,8 @@ void Game::updateBattle()
 
 void Game::updateGUI()
 {
-
+	std::string scoreString = std::to_string(score);
+	this->scoreText.setString(scoreString);
 }
 
 void Game::render()
