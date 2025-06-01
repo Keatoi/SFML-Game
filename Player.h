@@ -10,6 +10,7 @@ class Player
 private:
 	int initial_X = 10;
 	int initial_Y = 10;
+	float HP = 100.f;
 public:
 	Player();
 	virtual ~Player();
@@ -19,6 +20,9 @@ public:
 	float MoveSpeed;
 	float CNNCooldown;
 	float CNNCooldownMax;
+	bool bIsImmortal = false;
+	float ImmortalTimer;
+	float MaxImmortal = 2.f;
 
 	void initTexture();
 	void initVar();
@@ -32,6 +36,7 @@ public:
 	void UpdateAttacks();
 	void Render(sf::RenderTarget& Target);
 	void teleport(float XCoord, float YCoord);
+	void OnHit(float damage);
 	//Getters
 	const sf::Vector2f& getPos() const;
 	const sf::FloatRect getBounds() const;

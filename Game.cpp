@@ -252,6 +252,7 @@ void Game::updateBattle()
 			if (this->player->getBounds().intersects((*ai)->getBounds()))
 			{
 				//do damage or something
+				this->player->OnHit(10.f);
 			}
 			ai++;
 		}
