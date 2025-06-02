@@ -59,6 +59,11 @@ void Game::InitGUI()
 
 }
 
+void Game::InitSound()
+{
+	
+}
+
 Game::Game()
 {
 	this->InitVariables();

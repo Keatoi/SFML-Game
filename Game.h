@@ -28,6 +28,7 @@ private:
 	sf::Font font;
 	sf::Text scoreText;
 	sf::Text HPText;
+	
 	//misc
 	sf::Vector2i mousePos;
 	int score;
@@ -42,6 +43,7 @@ private:
 	void InitEnemies();
 	void InitPlayer();
 	void InitGUI();
+	void InitSound();
 public:
 	//Constructors & Destructors
 	Game();
