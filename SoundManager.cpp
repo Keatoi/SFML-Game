@@ -32,6 +32,7 @@ void SoundManager::playSound(const std::string& name)
 	if (sfx != Sounds.end())
 	{
 		sfx->second.play();
+		std::cout << "Sound Playing: "<< name<< std::endl;
 	}
 	else
 	{

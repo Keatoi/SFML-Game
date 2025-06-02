@@ -6,6 +6,7 @@ Player::Player()
 	this->initVar();
 	this->initTexture();
 	this->initSprite();
+	this->initSound();
 }
 
 Player::~Player()
@@ -39,6 +40,12 @@ void Player::initSprite()
 	this->sprite.setPosition(initial_X, initial_Y);
 	//Resize sprite
 	this->sprite.scale(3.f, 3.f);
+}
+
+void Player::initSound()
+{
+	SM.loadSound("PCDeath", "Audio/Explosion.wav");
+	SM.loadSound("SoundWave", "Audio/SoundWave.wav");
 }
 
 void Player::Move(const float dirX, const float dirY)
@@ -115,6 +122,7 @@ float Player::OnHit(float damage)
 		if (HP <= 0)
 		{
 			//ENDGAME
+			SM.playSound("PCDeath");
 		}
 	}
 	

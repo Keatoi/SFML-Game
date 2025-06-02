@@ -3,6 +3,7 @@
 #include<SFML/System.hpp>
 #include<SFML/Audio.hpp>
 #include<SFML/Graphics.hpp>
+#include "SoundManager.h"
 class Bullet
 {
 private:
@@ -11,6 +12,7 @@ private:
 	sf::Sprite BulletSprite;
 	sf::Vector2f Direction;
 	float MoveSpeed;
+	SoundManager SM;
 public:
 	Bullet();
 	Bullet(sf::Texture* texture, float scale_X, float scale_Y,float X_Origin, float Y_Origin, float dir_x, float dir_y, float move_speed);
@@ -18,5 +20,6 @@ public:
 	const sf::FloatRect getBounds() const;
 	void update();
 	void render(sf::RenderTarget* target);
+
 };
 

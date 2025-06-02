@@ -4,6 +4,7 @@
 #include"Player.h"
 #include "Bullet.h"
 #include "Enemy.h"
+#include "SoundManager.h"
 
 /* Game Engine wrapper class*/
 class Game
@@ -28,7 +29,8 @@ private:
 	sf::Font font;
 	sf::Text scoreText;
 	sf::Text HPText;
-	
+	//Sound
+	SoundManager SM;
 	//misc
 	sf::Vector2i mousePos;
 	int score;

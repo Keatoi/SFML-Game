@@ -5,12 +5,14 @@
 #include<SFML/Window.hpp>
 #include<SFML/Graphics.hpp>
 #include<SFML/Network.hpp>
+#include "SoundManager.h"
 class Player
 {
 private:
 	int initial_X = 10;
 	int initial_Y = 10;
 	float HP = 100.f;
+	SoundManager SM;
 public:
 	Player();
 	virtual ~Player();
@@ -27,6 +29,7 @@ public:
 	void initTexture();
 	void initVar();
 	void initSprite();
+	void initSound();
 	
 	//Game funcs
 	void Move(const float dirX, const float dirY);

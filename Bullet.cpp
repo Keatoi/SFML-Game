@@ -12,13 +12,15 @@ Bullet::Bullet(sf::Texture* texture,float scale_X, float scale_Y, float X_Origin
 	this->Direction.x = dir_x;
 	this->Direction.y = dir_y;
 	this->MoveSpeed = move_speed;
-	std::cout << "Generating bullet";
+	//std::cout << "Generating bullet";
 	if (!texture) {
 		std::cout << "Bullet texture is null!\n";
 	}
 	else {
 		//std::cout << "Bullet texture assigned.\n";
 	}
+	SM.loadSound("laser", "Audio/laser.wav");
+	SM.playSound("laser");
 }
 
 Bullet::~Bullet()

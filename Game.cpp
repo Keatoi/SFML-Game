@@ -53,7 +53,7 @@ void Game::InitGUI()
 	this->HPText.setFont(this->font);
 	this->HPText.setCharacterSize(12);
 	this->HPText.setFillColor(sf::Color::Green);
-	this->HPText.setString("Test");
+	
 
 
 
@@ -61,7 +61,8 @@ void Game::InitGUI()
 
 void Game::InitSound()
 {
-	
+	SM.loadSound("AIDeath", "Audio/Enemy_Death.wav");
+	SM.playMusic("Audio/BossWave.wav");
 }
 
 Game::Game()
@@ -72,6 +73,7 @@ Game::Game()
 	this->InitTextures();
 	this->InitPlayer();
 	this->InitEnemies();
+	this->InitSound();
 }
 
 Game::~Game()
@@ -224,6 +226,7 @@ void Game::updateEnemies()
 			
 			AI = enemies.erase(AI);
 			
+			
 		}
 		else
 		{
@@ -248,7 +251,7 @@ void Game::updateBattle()
 				//erase both the ai and projectile. Smart ptr so no manual deletion required.
 				
 				ai = enemies.erase(ai);
-				
+				SM.playSound("AIDeath");
 				pr = Projectiles.erase(pr);
 				enemyKill = true;
 			}
@@ -292,7 +295,7 @@ void Game::render()
 	this->player->Render(*this->Window);
 	for (const auto& i : this->Projectiles)
 	{
-		std::cout << "rendering bullet";
+		//std::cout << "rendering bullet";
 		i->render(this->Window);
 	}
 	for (const auto& i : this->enemies)
