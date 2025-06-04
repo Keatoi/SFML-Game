@@ -45,7 +45,7 @@ void Player::initSprite()
 void Player::initSound()
 {
 	SM.loadSound("PCDeath", "Audio/Explosion.wav");
-	SM.loadSound("SoundWave", "Audio/SoundWave.wav");
+	
 }
 
 void Player::Move(const float dirX, const float dirY)

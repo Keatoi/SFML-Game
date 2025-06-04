@@ -12,7 +12,7 @@ void Game::InitWindow()
 {
 	this->VidMode.height = 720;
 	this->VidMode.width = 480;
-	this->Window = new sf::RenderWindow(this->VidMode, "Test", sf::Style::Titlebar | sf::Style::Close);
+	this->Window = new sf::RenderWindow(this->VidMode, "Aether-Ace v0.5", sf::Style::Titlebar | sf::Style::Close);
 	this->Window->setFramerateLimit(30);
 }
 
@@ -21,6 +21,8 @@ void Game::InitTextures()
 	//initialise textures into the map here
 	this->Textures["BULLET"] = new sf::Texture();
 	this->Textures["BULLET"]->loadFromFile("Textures/Bullet.png");
+	this->Textures["BOMB"] = new sf::Texture();
+	this->Textures["BOMB"]->loadFromFile("Textures/Bomb.png");
 	if (!this->Textures["BULLET"]->loadFromFile("Textures/Bullet.png"))
 		std::cout << "Failed to load bullet texture!\n";
 }
@@ -145,6 +147,11 @@ void Game::updateInput()
 	{
 		this->Projectiles.push_back(std::make_unique<Bullet>(this->Textures["BULLET"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width / 2, player->getPos().y, 0.f, 1.f, 5.f));
 	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && this->player->bCanAttack())
+	{
+		this->Bombs.push_back(std::make_unique<Bomb>(this->Textures["BOMB"], 0.5f, 0.5f, player->getPos().x + this->player->getBounds().width / 2, player->getPos().y, 0.f, 1.f));
+		
+	}
 }
 
 void Game::updatePhysics()
@@ -167,6 +174,33 @@ void Game::updatePhysics()
 			pr++;
 		}
 		
+	}
+	for (auto bm = Bombs.begin(); bm != Bombs.end();)
+	{
+		(*bm)->update(deltaTime.asSeconds());
+		if ((*bm)->isExploded())
+		{
+			sf::Vector2f BombPos = (*bm)->getPosition();
+			float rad = (*bm)->getBlastRadius();
+			for (auto em = enemies.begin(); em != enemies.end();)
+			{
+				float dist = distance((*em)->getPos(), (*bm)->getPosition());
+				if (dist < rad)
+				{
+					em = enemies.erase(em);
+				}
+				else
+				{
+					em++;
+				}
+			}
+			bm = this->Bombs.erase(bm);
+			
+		}
+		else
+		{
+			bm++;
+		}
 	}
 	//check if player is out of bounds
 	//Bottom
@@ -299,6 +333,10 @@ void Game::render()
 		i->render(this->Window);
 	}
 	for (const auto& i : this->enemies)
+	{
+		i->render(this->Window);
+	}
+	for (const auto& i : this->Bombs)
 	{
 		i->render(this->Window);
 	}

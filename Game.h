@@ -5,6 +5,7 @@
 #include "Bullet.h"
 #include "Enemy.h"
 #include "SoundManager.h"
+#include "bomb.h"
 
 /* Game Engine wrapper class*/
 class Game
@@ -18,6 +19,7 @@ private:
 	//Resource maps
 	std::map<std::string, sf::Texture*> Textures;
 	std::vector<std::unique_ptr<Bullet>> Projectiles;
+	std::vector<std::unique_ptr<Bomb>> Bombs;
 	float spawnTimer;
 	float spawnTimerMax;
 	//GO
@@ -65,5 +67,8 @@ public:
 	void render();
 	void renderGUI();
 	void run();
+	float distance(sf::Vector2f a, sf::Vector2f b) {
+		return std::sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+	}
 };
 
