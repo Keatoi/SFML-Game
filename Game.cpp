@@ -55,7 +55,13 @@ void Game::InitGUI()
 	this->HPText.setFont(this->font);
 	this->HPText.setCharacterSize(12);
 	this->HPText.setFillColor(sf::Color::Green);
-	
+	//Init wave text
+	this->waveCount = 1;
+	this->WaveText.setFont(this->font);
+	this->WaveText.setCharacterSize(12);
+	this->WaveText.setFillColor(sf::Color::White);
+	this->WaveText.setString("Wave: " + std::to_string(waveCount));
+	this->WaveText.setPosition(0, 10);
 
 
 
@@ -213,12 +219,23 @@ void Game::updatePhysics()
 	{
 		this->player->sprite.setPosition(0,this->player->getPos().y);
 	}
+	// Left
+	if (this->player->getBounds().left + this->player->getBounds().width < 0)
+	{
+		this->player->sprite.setPosition(this->Window->getSize().x, this->player->getPos().y);
+	}
+	// Top
+	if (this->player->getBounds().top + this->player->getBounds().height < 0)
+	{
+		this->player->sprite.setPosition(this->player->getPos().x, this->Window->getSize().y);
+	}
+
 }
 
 void Game::spawnEnemyGroup(int count)
 {
-	//Position the group somewhere in the window with a 30 pixel margin on each side
-	float posX = rand() % (this->Window->getSize().x - 60) + 30.f;
+	//Position the group somewhere in the window with a 45 pixel margin on each side
+	float posX = rand() % (this->Window->getSize().x - 90) + 45.f;
 	for (size_t i = 0; i < count; i++)
 	{
 		float phase = i * 0.5f;
@@ -226,6 +243,7 @@ void Game::spawnEnemyGroup(int count)
 		float y = -1.f - (i * 40.f);
 		this->enemies.push_back(std::make_unique<Enemy>(0, 0.3f, 0.3f, posX, y,20.f,0.02f,i * 0.5));
 		enemyCount++;
+		std::cout << "AI Count: " << enemyCount << std::endl;
 	}
 }
 
@@ -237,15 +255,21 @@ void Game::updateEnemies()
 	{
 		spawnEnemyGroup(spawnCount);
 		this->spawnTimer = 0.f;//reset spawntimer back down to 0;
-		spawnCount *= 2;
+		spawnCount *= 2.f;
 	}
 	if (enemyCount >= maxEnemies)
 	{
 		//start new wave
-		spawnCount, enemyCount,spawnTimer = 0.f;
+		waveCount++;
+		spawnCount = 1.f;
+		enemyCount = waveCount;
+		spawnTimer = 0.f;
 		//slightly increase diff
-		spawnTimerMax = std::max(0.5f, spawnTimerMax -= 0.5f);
+		spawnTimerMax = std::max(0.5f, spawnTimerMax -= 0.1f);
 		//TODO New Wave Transition
+		
+		this->WaveText.setString("Wave: " + std::to_string(waveCount));
+		enemies.clear();
 
 	}
 	//update
@@ -270,6 +294,10 @@ void Game::updateEnemies()
 	}
 	
 	
+}
+
+void Game::WaveTransition()
+{
 }
 
 void Game::updateBattle()
@@ -348,6 +376,7 @@ void Game::renderGUI()
 {
 	this->Window->draw(this->scoreText);
 	this->Window->draw(this->HPText);
+	this->Window->draw(this->WaveText);
 }
 
 void Game::run()

@@ -31,9 +31,11 @@ private:
 	sf::Font font;
 	sf::Text scoreText;
 	sf::Text HPText;
+	sf::Text WaveText;
 	//Sound
 	SoundManager SM;
 	//misc
+	int waveCount = 0;
 	sf::Vector2i mousePos;
 	int score;
 	sf::Time deltaTime;
@@ -62,6 +64,7 @@ public:
 	void updatePhysics();
 	void spawnEnemyGroup(int count);
 	void updateEnemies();
+	void WaveTransition();
 	void updateBattle();
 	void updateGUI();
 	void render();
