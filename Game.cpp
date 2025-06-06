@@ -4,7 +4,7 @@ void Game::InitVariables()
 {
 	this->Window = nullptr;
 	this->score = 0;
-	this->maxEnemies = 100;
+	this->maxEnemies = 20;
 	this->spawnCount = 1;
 }
 
@@ -12,7 +12,7 @@ void Game::InitWindow()
 {
 	this->VidMode.height = 720;
 	this->VidMode.width = 480;
-	this->Window = new sf::RenderWindow(this->VidMode, "Aether-Ace v0.5", sf::Style::Titlebar | sf::Style::Close);
+	this->Window = new sf::RenderWindow(this->VidMode, "Aether-Ace Build 19", sf::Style::Titlebar | sf::Style::Close);
 	this->Window->setFramerateLimit(30);
 }
 
@@ -62,15 +62,36 @@ void Game::InitGUI()
 	this->WaveText.setFillColor(sf::Color::White);
 	this->WaveText.setString("Wave: " + std::to_string(waveCount));
 	this->WaveText.setPosition(0, 10);
-
-
-
+	//Init MenuText
+	this->MenuText.setFont(this->font);
+	this->MenuText.setCharacterSize(18);
+	this->MenuText.setFillColor(sf::Color::Red);
+	this->MenuText.setOutlineColor(sf::Color::White);
+	this->MenuText.setString("Press ENTR to Start or ESC to Quit");
+	this->MenuText.setPosition(this->Window->getSize().x / 8, this->Window->getSize().y / 2);
+	//Init GameOver Title Text
+	this->GETitle.setFont(this->font);
+	this->GETitle.setCharacterSize(32);
+	this->GETitle.setFillColor(sf::Color::Red);
+	this->GETitle.setString("Game End");
+	this->GETitle.setPosition(this->Window->getSize().x / 4, this->Window->getSize().y / 4);
+	//Init Game Over Score Text
+	this->GEScore.setFont(this->font);
+	this->GEScore.setCharacterSize(24);
+	this->GEScore.setFillColor(sf::Color::White);
+	this->GEScore.setPosition(this->Window->getSize().x / 4, this->Window->getSize().y / 3);
+	//Init GO Exit Text
+	this->GEQuit.setFont(this->font);
+	this->GEQuit.setCharacterSize(18);
+	this->GEQuit.setFillColor(sf::Color::Red);
+	this->GEQuit.setString("Press ESC to quit or ENTR to Restart");
+	this->GEQuit.setPosition(this->Window->getSize().x / 8, (this->Window->getSize().y / 2) + 10);
 }
 
 void Game::InitSound()
 {
 	SM.loadSound("AIDeath", "Audio/Enemy_Death.wav");
-	SM.playMusic("Audio/BossWave.wav");
+	SM.playMusic("Audio/BGMMenu.wav");
 }
 
 Game::Game()
@@ -112,7 +133,7 @@ void Game::EventUpdate()
 			this->Window->close();
 			break;
 		case sf::Event::KeyPressed:
-			if (this->EV.key.code == sf::Keyboard::Escape) this->Window->close();
+			if (this->EV.key.code == sf::Keyboard::Escape) Window->close();
 			break;
 		}
 	}
@@ -120,17 +141,46 @@ void Game::EventUpdate()
 //FUNCTIONS
 void Game::update()
 {
-	this->EventUpdate();
-	//update mouse Pos relative to window
-	//std::cout << "Mouse Pos ( " << sf::Mouse::getPosition(*this->Window).x << " , " << sf::Mouse::getPosition(*this->Window).y << " ) \n";
-	mousePos = sf::Mouse::getPosition(*this->Window);
-	this->updateInput();
-	this->updatePhysics();
-	this->player->Update(deltaTime.asSeconds());
-	//this->player->LookAtMouse(*this->Window);
-	this->updateEnemies();
-	this->updateBattle();
-	this->updateGUI();
+	switch (currState)
+	{
+	case GameState::EMENU:
+		updateMenu();
+		break;
+	case GameState::EGAME:
+		this->EventUpdate();
+		
+		//update mouse Pos relative to window
+		//std::cout << "Mouse Pos ( " << sf::Mouse::getPosition(*this->Window).x << " , " << sf::Mouse::getPosition(*this->Window).y << " ) \n";
+		mousePos = sf::Mouse::getPosition(*this->Window);
+		this->updateInput();
+		this->updatePhysics();
+		this->player->Update(deltaTime.asSeconds());
+		//this->player->LookAtMouse(*this->Window);
+		this->updateEnemies();
+		this->updateBattle();
+		this->updateGUI();
+		break;
+	case GameState::EOVER:
+		updateEnd();
+			break;
+	}
+	if (score <= -100.f)
+	{
+		SM.stopMusic();
+		SM.playMusic("Audio/BGMMenu.wav");
+		currState = GameState::EOVER;
+	}
+}
+
+void Game::updateMenu()
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+	{
+		//Stop music, switch to gameplay state and the start the in-game music track
+		SM.stopMusic();
+		this->currState = GameState::EGAME;
+		SM.playMusic("Audio/BossWave.wav");
+	}
 }
 
 void Game::updateInput()
@@ -242,8 +292,8 @@ void Game::spawnEnemyGroup(int count)
 		//spawn each member of the group 40 pixels apart
 		float y = -1.f - (i * 40.f);
 		this->enemies.push_back(std::make_unique<Enemy>(0, 0.3f, 0.3f, posX, y,20.f,0.02f,i * 0.5));
-		enemyCount++;
-		std::cout << "AI Count: " << enemyCount << std::endl;
+		
+		
 	}
 }
 
@@ -264,25 +314,28 @@ void Game::updateEnemies()
 		spawnCount = 1.f;
 		enemyCount = waveCount;
 		spawnTimer = 0.f;
+		maxEnemies *= 2;
 		//slightly increase diff
 		spawnTimerMax = std::max(0.5f, spawnTimerMax -= 0.1f);
 		//TODO New Wave Transition
-		
+		std::cout << "AI MAX: " << maxEnemies << std::endl;
 		this->WaveText.setString("Wave: " + std::to_string(waveCount));
 		enemies.clear();
 
 	}
 	//update
-	
+	//Update every current enemy entity
 	for (auto AI = enemies.begin(); AI != enemies.end();)
 	{
+		//call their update function
 		(*AI)->update(deltaTime);
-		//Out of bounds culling (top of screen)
+		//Out of bounds culling 
 
 		if ((*AI)->getBounds().top > this->Window->getSize().y)
 		{
 			
 			AI = enemies.erase(AI);
+			score -= 10;
 			
 			
 		}
@@ -316,6 +369,8 @@ void Game::updateBattle()
 				SM.playSound("AIDeath");
 				pr = Projectiles.erase(pr);
 				enemyKill = true;
+				enemyCount++;
+				std::cout << "AI Dead: " << enemyCount << std::endl;
 			}
 			else
 			{
@@ -329,6 +384,14 @@ void Game::updateBattle()
 			{
 				//do damage or something
 				this->HPText.setString(std::to_string(this->player->OnHit(10.f)));
+				if (this->player->GetHP() <= 0.f)
+				{
+					
+					//End Game
+					currState = GameState::EOVER;
+					SM.stopMusic();
+					SM.playMusic("Audio/BGMMenu.wav");
+				}
 				
 			}
 			ai++;
@@ -347,13 +410,20 @@ void Game::updateGUI()
 	
 }
 
-void Game::render()
+void Game::updateEnd()
 {
-	this->Window->clear(sf::Color::Black);//Clear last frame
-	/*++++++++++++++++
-	+++DRAW OBJ++++++++
-	+++++++++++++++++++*/
-	//this->Window->draw(TestEnemy);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) restart();
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) this->Window->close();
+}
+
+void Game::renderMenu()
+{
+	this->Window->draw(this->MenuText);
+
+}
+
+void Game::renderGame()
+{
 	this->player->Render(*this->Window);
 	for (const auto& i : this->Projectiles)
 	{
@@ -369,6 +439,37 @@ void Game::render()
 		i->render(this->Window);
 	}
 	this->renderGUI();
+}
+
+void Game::RenderEnd()
+{
+	//Get Final Score
+	this->GEScore.setString("Final Score: " + std::to_string(score));
+	this->Window->draw(this->GETitle);
+	this->Window->draw(this->GEScore);
+	this->Window->draw(this->GEQuit);
+}
+
+void Game::render()
+{
+	this->Window->clear(sf::Color::Black);//Clear last frame
+	/*++++++++++++++++
+	+++DRAW OBJ++++++++
+	+++++++++++++++++++*/
+	
+	switch (currState)
+	{
+	case(GameState::EMENU):
+		renderMenu();
+		break;
+	case(GameState::EGAME):
+		renderGame();
+		break;
+	case(GameState::EOVER):
+		RenderEnd();
+		break;
+	}
+	
 	this->Window->display();//Send frame to display
 }
 
@@ -388,4 +489,14 @@ void Game::run()
 		render();
 		deltaTime = deltaClock.restart();
 	}
+}
+
+void Game::restart()
+{
+	this->score = 0;
+	this->maxEnemies = 20;
+	this->spawnCount = 1;
+	currState = GameState::EMENU;
+	SM.stopMusic();
+	SM.playMusic("Audio/BGMMenu.wav");
 }

@@ -40,6 +40,7 @@ public:
 	void Render(sf::RenderTarget& Target);
 	void teleport(float XCoord, float YCoord);
 	float OnHit(float damage);
+	float GetHP() { return HP; }
 	//Getters
 	const sf::Vector2f& getPos() const;
 	const sf::FloatRect getBounds() const;

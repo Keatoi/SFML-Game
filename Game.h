@@ -8,6 +8,12 @@
 #include "bomb.h"
 
 /* Game Engine wrapper class*/
+enum class GameState
+{
+	EMENU,
+	EGAME,
+	EOVER
+};
 class Game
 {
 private:
@@ -22,6 +28,7 @@ private:
 	std::vector<std::unique_ptr<Bomb>> Bombs;
 	float spawnTimer;
 	float spawnTimerMax;
+	GameState currState = GameState::EMENU;
 	//GO
 	sf::RectangleShape TestEnemy;
 	std::vector<std::unique_ptr<Enemy>> enemies;
@@ -32,6 +39,13 @@ private:
 	sf::Text scoreText;
 	sf::Text HPText;
 	sf::Text WaveText;
+	//MenuGUI
+	sf::Text MenuText;
+	sf::Image Title;
+	//Game Over GUI
+	sf::Text GETitle;
+	sf::Text GEScore;
+	sf::Text GEQuit;
 	//Sound
 	SoundManager SM;
 	//misc
@@ -60,6 +74,7 @@ public:
 	//Functions
 	void EventUpdate(); //poll events
 	void update();
+	void updateMenu();
 	void updateInput();
 	void updatePhysics();
 	void spawnEnemyGroup(int count);
@@ -67,9 +82,14 @@ public:
 	void WaveTransition();
 	void updateBattle();
 	void updateGUI();
+	void updateEnd();
+	void renderMenu();
+	void renderGame();
+	void RenderEnd();
 	void render();
 	void renderGUI();
 	void run();
+	void restart();
 	float distance(sf::Vector2f a, sf::Vector2f b) {
 		return std::sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 	}
